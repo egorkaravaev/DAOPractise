@@ -1,6 +1,7 @@
 package dao;
 
 import entity.Genre;
+import util.App;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,17 +10,17 @@ import java.util.List;
 public class GenreDAO extends AbstractDAO<Long, Genre>{
     private static final String SELECT_GID = "SELECT GId FROM Genre WHERE GName = ?";
     private static final String INSERT_GENRE = "INSERT INTO Genre (GName) VALUES (?)";
-    private static final String SELECT_ALL_GENRES = "SELECT * FROM Genre";
+    private static final String SELECT_ALL_GENRES = "SELECT * FROM Genre WHERE Gname IS NOT NULL";
     private static final String SELECT_BY_ID = "SELECT * FROM Genre WHERE GId = ?";
     private static final String UPDATE_GENRE = "UPDATE Genre SET GName = ? WHERE GId = ?";
 
-    Connection connection = getConnection();
 
     public void create(Genre genre) throws SQLException {
 
 /** Checking the existence of the author in the database.
  *  If such a author already exists, then the author is not added, if not, then a new author is created.
  */
+        Connection connection = App.getCp().retrieve();
         PreparedStatement ps = null;
         PreparedStatement ps2 = null;
         try {
@@ -33,10 +34,9 @@ public class GenreDAO extends AbstractDAO<Long, Genre>{
                 i++;
             }
             if (i > 0) {
-                System.out.println("Такой жанр уже есть");
+                System.out.println("This genre already exists!");
                 genre.setId(GId);
             } else {
-                System.out.println("Такого жанра ещё нет");
                 ps2 = connection.prepareStatement(INSERT_GENRE);
                 ps2.setString(1, genre.getName());
                 ps2.executeUpdate();
@@ -53,12 +53,13 @@ public class GenreDAO extends AbstractDAO<Long, Genre>{
                 ps2.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
     }
 
     public List<Genre> getAll() throws SQLException {
+        Connection connection = App.getCp().retrieve();
         List<Genre> genreList = new ArrayList<Genre>();
 
         Statement s = null;
@@ -78,13 +79,14 @@ public class GenreDAO extends AbstractDAO<Long, Genre>{
                 s.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
         return genreList;
     }
 
     public Genre getById(Long id) throws SQLException {
+        Connection connection = App.getCp().retrieve();
         PreparedStatement ps = null;
         Genre genre = new Genre();
         try {
@@ -102,13 +104,14 @@ public class GenreDAO extends AbstractDAO<Long, Genre>{
                 ps.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
         return genre;
     }
 
     public void update(Genre genre) throws SQLException {
+        Connection connection = App.getCp().retrieve();
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(UPDATE_GENRE);
@@ -122,7 +125,7 @@ public class GenreDAO extends AbstractDAO<Long, Genre>{
                 ps.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
     }

@@ -2,6 +2,7 @@ package dao;
 
 
 import entity.Book;
+import util.App;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,15 +11,14 @@ import java.util.List;
 public class BookDAO extends AbstractDAO<Long, Book>{
     private static final String SELECT_BID = "SELECT BId FROM Book WHERE BName = ?";
     private static final String INSERT_BOOK = "INSERT INTO Book (BName,Pages,Date,Genre_Id,Author_Id) VALUES (?,?,?,?,?)";
-    private static final String SELECT_ALL_BOOKS = "SELECT * FROM Book";
+    private static final String SELECT_ALL_BOOKS = "SELECT * FROM Book WHERE Bname IS NOT NULL";
     private static final String SELECT_BY_ID = "SELECT * FROM Book WHERE BId = ?";
     private static final String UPDATE_BOOK = "UPDATE Book SET BName = ?, Pages = ?, Date = ? WHERE BId = ?";
     private static final String DELETE_BOOK = "DELETE FROM Book WHERE BId = ?";
 
 
-    Connection connection = getConnection();
-
     public void create(Book book) throws SQLException{
+        Connection connection = App.getCp().retrieve();
 
         PreparedStatement ps = null;
         try {
@@ -58,12 +58,13 @@ public class BookDAO extends AbstractDAO<Long, Book>{
                 ps.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
     }
 
     public List<Book> getAll() throws SQLException {
+        Connection connection = App.getCp().retrieve();
         List<Book> bookList = new ArrayList<Book>();
 
         Statement s = null;
@@ -85,13 +86,14 @@ public class BookDAO extends AbstractDAO<Long, Book>{
                 s.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
         return bookList;
     }
 
     public Book getById(Long id) throws SQLException {
+        Connection connection = App.getCp().retrieve();
         PreparedStatement ps = null;
         Book book = new Book();
         try {
@@ -111,13 +113,14 @@ public class BookDAO extends AbstractDAO<Long, Book>{
                 ps.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
         return book;
     }
 
     public void update(Book book) throws SQLException {
+        Connection connection = App.getCp().retrieve();
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(UPDATE_BOOK);
@@ -133,12 +136,13 @@ public class BookDAO extends AbstractDAO<Long, Book>{
                 ps.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
     }
 
     public void delete(Book book) throws SQLException {
+        Connection connection = App.getCp().retrieve();
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(DELETE_BOOK);
@@ -151,7 +155,7 @@ public class BookDAO extends AbstractDAO<Long, Book>{
                 ps.close();
             }
             if (connection != null) {
-                connection.close();
+                App.getCp().putBack(connection);
             }
         }
     }
